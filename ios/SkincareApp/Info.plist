@@ -34,6 +34,10 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>SkinScan needs camera access to photograph ingredient lists on product labels.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SkinScan needs photo library access to analyze ingredient labels from your gallery.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>UILaunchStoryboardName</key>

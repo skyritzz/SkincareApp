@@ -73,3 +73,16 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+.env
+
+# SkinScan — additional secrets
+.env.local
+.env.development
+.env.production
+.env.staging
+google-services.json
+GoogleService-Info.plist
+
+# Build output
+android/app/build/
