@@ -46,24 +46,46 @@ powered by Claude AI (Anthropic).
 
 ## 🏗 Project Structure
 
+
+```
 SkinScan/
+├── android/                           # Android native code
 ├── src/
-│   ├── components/        # Reusable UI components
-│   │   └── ErrorBoundary.tsx
-│   ├── screens/           # App screens
-│   │   ├── OnboardingScreen.tsx
-│   │   ├── QuickResultsScreen.tsx
-│   │   └── HistoryScreen.tsx
-│   ├── services/          # External integrations
-│   │   └── claudeService.ts
-│   ├── utils/             # Helpers & validators
-│   │   ├── logger.ts
-│   │   └── validateApiResponse.ts
-│   ├── navigation/        # React Navigation setup
-│   └── types/             # TypeScript types
-├── android/               # Android native code
-├── .env.example           # Environment variable template
+│   ├── components/
+│   │   └── ErrorBoundary.tsx          # Global error boundary
+│   ├── lib/
+│   │   └── supabase.ts                # Supabase client setup
+│   ├── navigation/
+│   │   ├── AppNavigator.tsx           # Root navigation setup
+│   │   └── types.ts                   # Navigation type definitions
+│   ├── screens/
+│   │   ├── auth/
+│   │   │   ├── LoginScreen.tsx        # Login
+│   │   │   └── SignUpScreen.tsx       # Sign up
+│   │   ├── onboarding/
+│   │   │   ├── WelcomeScreen.tsx
+│   │   │   ├── SkinTypeScreen.tsx
+│   │   │   ├── HairTypeScreen.tsx
+│   │   │   ├── SkinConcernsScreen.tsx
+│   │   │   └── AllSetScreen.tsx
+│   │   ├── CameraScreen.tsx           # Ingredient label scanner
+│   │   ├── HomeScreen.tsx
+│   │   ├── HistoryScreen.tsx          # Past scans via Supabase
+│   │   ├── IngredientBreakdownScreen.tsx
+│   │   ├── ProfileScreen.tsx
+│   │   ├── QuickResultsScreen.tsx     # Fast analysis results
+│   │   └── ResultsScreen.tsx          # Detailed analysis results
+│   ├── services/
+│   │   └── claudeService.ts           # Claude Haiku API integration
+│   ├── types/
+│   │   └── analysis.ts                # TypeScript type definitions
+│   └── utils/
+│       ├── logger.ts                  # Environment-aware logger
+│       ├── userProfile.ts             # User profile helpers
+│       └── validateApiResponse.ts     # API response validator
+├── .env.example                       # Environment variable template
 └── README.md
+```
 
 
 ---
