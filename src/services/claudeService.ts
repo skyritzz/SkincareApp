@@ -3,6 +3,7 @@ import type { AnalysisResult, IngredientAnalysis } from '../types/analysis';
 import { getUserProfile } from '../utils/userProfile';
 import { supabase } from '../lib/supabase';
 import { logger } from '../utils/logger';
+import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-toast-message';
 import { validateClaudeResponse, validateIngredientText } from '../utils/validateApiResponse';
 
@@ -299,6 +300,20 @@ async function analyzeIngredientImageBase64(
   category: string,
 ): Promise<AnalysisResult> {
   logger.info('ClaudeService', 'Starting analysis');
+
+  const netInfo = await NetInfo.fetch();
+  logger.info('ClaudeService', 'Network type: ' + netInfo.type);
+  if (!netInfo.isConnected) {
+    throw new Error('No internet connection. Please check your network and try again.');
+  }
+  if (netInfo.type === 'cellular') {
+    Toast.show({
+      type: 'info',
+      text1: 'You are on mobile data. Analysis may be slower.',
+      position: 'bottom',
+    });
+  }
+
   const rawKey = process.env.ANTHROPIC_API_KEY;
   const key = normalizeApiKey(typeof rawKey === 'string' ? rawKey : '');
   if (!key) {
@@ -342,7 +357,7 @@ async function analyzeIngredientImageBase64(
   while (attempt <= maxAttempts) {
     try {
       const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), 15000);
+      const id = setTimeout(() => controller.abort(), 30000);
       const res = await fetch(ANTHROPIC_API_URL, {
         method: 'POST',
         headers: {
@@ -386,8 +401,19 @@ async function analyzeIngredientImageBase64(
 
     } catch (err: any) {
       if (err.name === 'AbortError') {
-        logger.error('ClaudeService', 'Request timed out');
-        throw new Error('Request timed out. Check your internet connection.');
+        if (attempt < maxAttempts) {
+          logger.warn('ClaudeService', 'Request timed out, retrying...');
+          Toast.show({
+            type: 'info',
+            text1: 'Still analyzing, please wait...',
+            position: 'bottom',
+          });
+          attempt++;
+          continue;
+        } else {
+          logger.error('ClaudeService', 'Request timed out after retry');
+          throw new Error('Request timed out. Check your internet connection.');
+        }
       }
       if (
         err.message === 'Our AI analyzer is taking a break. Please try again in a few hours.' ||
@@ -451,6 +477,20 @@ export async function analyzeIngredientText(
   const validatedText = validateIngredientText(ingredientsText);
 
   logger.info('ClaudeService', 'Starting text analysis');
+
+  const netInfo = await NetInfo.fetch();
+  logger.info('ClaudeService', 'Network type: ' + netInfo.type);
+  if (!netInfo.isConnected) {
+    throw new Error('No internet connection. Please check your network and try again.');
+  }
+  if (netInfo.type === 'cellular') {
+    Toast.show({
+      type: 'info',
+      text1: 'You are on mobile data. Analysis may be slower.',
+      position: 'bottom',
+    });
+  }
+
   const rawKey = process.env.ANTHROPIC_API_KEY;
   const key = normalizeApiKey(typeof rawKey === 'string' ? rawKey : '');
   if (!key) {
@@ -486,7 +526,7 @@ export async function analyzeIngredientText(
   while (attempt <= maxAttempts) {
     try {
       const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), 15000);
+      const id = setTimeout(() => controller.abort(), 30000);
       const res = await fetch(ANTHROPIC_API_URL, {
         method: 'POST',
         headers: {
@@ -525,8 +565,19 @@ export async function analyzeIngredientText(
       throw new Error('Analysis failed. Please try again.');
     } catch (err: any) {
       if (err.name === 'AbortError') {
-        logger.error('ClaudeService', 'Request timed out');
-        throw new Error('Request timed out. Check your internet connection.');
+        if (attempt < maxAttempts) {
+          logger.warn('ClaudeService', 'Request timed out, retrying...');
+          Toast.show({
+            type: 'info',
+            text1: 'Still analyzing, please wait...',
+            position: 'bottom',
+          });
+          attempt++;
+          continue;
+        } else {
+          logger.error('ClaudeService', 'Request timed out after retry');
+          throw new Error('Request timed out. Check your internet connection.');
+        }
       }
       if (err.message.includes('analyzer') || err.message.includes('wrong') || err.message.includes('failed') || err.message.includes('timed out')) {
         throw err;
